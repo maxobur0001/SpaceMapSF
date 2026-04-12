@@ -22,24 +22,6 @@ local cameraZoomSpeed = 50000
 ---Start Zoom
 local cameraZoomStart = 200000
 
--- Existing planets. This is planets, that's writed in list with owner and name
-local existingPlanets = {
-    {
-        id = "N-18X7YD7Z",
-        name = "Первая Буровая",
-        owner = "AstricUnion"
-    },
-    {
-        id = "RE4X130Y1B4Z",
-        name = "Низкоплан",
-    },
-    {
-        id = "R1AX28YD4Z",
-        name = "Миниземля"
-    }
-}
-
-
 local ch = chip()
 ch.CHUNK_OFFSET = Vector()
 
@@ -146,15 +128,19 @@ local scanned = {
 }
 
 -- Decode and add planets from list to already scanned
-for _, planet in ipairs(existingPlanets) do
-    local type, planetPos = decodeId(planet.id)
-    scanned[planet.id] = {
-        name = planet.name or planet.id,
-        type = type,
-        position = planetPos,
-        owner = planet.owner
-    }
-end
+-- Existing planets. This is planets, that's writed in list with owner and name
+http.get("https://raw.githubusercontent.com/maxobur0001/SpaceMapSF/refs/heads/main/planet_registry.json", function(body)
+    local existingPlanets = json.decode(body)
+    for _, planet in ipairs(existingPlanets) do
+        local type, planetPos = decodeId(planet.id)
+        scanned[planet.id] = {
+            name = planet.name or planet.id,
+            type = type,
+            position = planetPos,
+            owner = planet.owner
+        }
+    end
+end)
 
 -- Find planets, that's already initialized
 -- for _, planet in ipairs(find.byClass("infmap_planet")) do
